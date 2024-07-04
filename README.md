@@ -1,1 +1,1 @@
-# msa-rabbitmq
+# k8s-rabbitmq
