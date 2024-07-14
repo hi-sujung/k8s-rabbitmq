@@ -1,1 +1,16 @@
 # msa-rabbitmq Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: msa-rabbitmq
+  labels:
+    app: msa-rabbitmq
+spec:
+  type: LoadBalancer # 대시보드 접근용
+  ports:
+  - port: 5672
+    name: amqp
+  - port: 15672
+    name: management
+  selector:
+    app: msa-rabbitmq
