@@ -1,1 +1,50 @@
 # msa-rabbitmq StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: msa-rabbitmq
+spec:
+  replicas: 1
+  serviceName: msa-rabbitmq
+  selector:
+    matchLabels:
+      app: msa-rabbitmq
+  template:
+    metadata:
+      labels:
+        app: msa-rabbitmq
+    spec:
+      containers:
+      - name: msa-rabbitmq
+        image: rabbitmq:3-management
+        ports:
+        - containerPort: 5672
+          name: amqp
+        - containerPort: 15672
+          name: management
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: RABBITMQ_DEFAULT_USER
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: RABBITMQ_DEFAULT_PASS
+        volumeMounts:
+        - mountPath: /var/lib/rabbitmq
+          name: rabbitmq-data
+        livenessProbe:
+            httpGet:
+              path: /
+              port: 15672
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 10
+      volumes:
+        - name: rabbitmq-data
+          persistentVolumeClaim:
+            claimName: msa-rabbitmq-pvc
